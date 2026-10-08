@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width,initial-scale=1">
+				<title>Смена пароля</title>
+			</head>
+	<body style="margin:0;padding:0;background:#f5f5f5;font-family:'Inter','Segoe UI',Arial,Helvetica,sans-serif;color:#0a0a0a;">
+		<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+			   style="background:#f5f5f5;padding:40px 12px;">
+			<tr>
+				<td align="center">
+					<table role="presentation" width="620" cellpadding="0" cellspacing="0"
+						   style="max-width:620px;width:100%;background:#ffffff;overflow:hidden;box-shadow:0 6px 28px rgba(0,0,0,0.08);">
+
+						<!-- Шапка: бренд из my.ini вставляется как есть -->
+						<tr>
+							<td style="background:#0a0a0a;padding:28px 40px 24px 40px;border-bottom:3px solid #ffcc00;">
+								<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+									<tr>
+										<td valign="middle" style="font-size:28px;font-weight:900;letter-spacing:1px;line-height:1;">
+											{{BrandHtml}}
+										</td>
+										<td valign="middle" align="right"
+											style="font-size:10px;color:#8a8a8a;letter-spacing:2px;text-transform:uppercase;">
+											Информационная<br>безопасность
+                  </td>
+									</tr>
+									<tr>
+										<td colspan="2" style="padding-top:10px;font-size:12px;color:#8a8a8a;letter-spacing:0.3px;">
+											{{CompanyTagline}}
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+
+						<tr>
+							<td style="padding:36px 40px 0 40px;">
+								<table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:18px;">
+									<tr>
+										<td style="background:#ffcc00;width:44px;height:4px;"></td>
+									</tr>
+								</table>
+								<div style="font-size:11px;font-weight:700;color:#0a0a0a;letter-spacing:2px;text-transform:uppercase;">
+									Уведомление о смене пароля
+								</div>
+								<h1 style="margin:12px 0 0;font-size:28px;line-height:1.2;font-weight:800;color:#0a0a0a;letter-spacing:-0.5px;">
+									{{Greeting}}
+								</h1>
+								<p style="margin:16px 0 0;font-size:15px;line-height:1.6;color:#555555;">
+									Для вашей учётной записи <b style="color:#0a0a0a;">{{UserName}}</b> был установлен новый пароль.
+								</p>
+							</td>
+						</tr>
+
+						<tr>
+							<td style="padding:28px 40px 0 40px;">
+								<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+									   style="background:#0a0a0a;border-left:4px solid #ffcc00;">
+									<tr>
+										<td style="padding:24px 28px;">
+											<div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#ffcc00;font-weight:700;">
+												Новый пароль
+											</div>
+											<div style="margin-top:12px;font-family:Consolas,'Courier New',monospace;font-size:28px;font-weight:700;letter-spacing:2px;color:#ffffff;word-break:break-all;">
+												{{NewPassword}}
+											</div>
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+
+						<tr>
+							<td style="padding:28px 40px 0 40px;">
+								<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+									   style="font-size:14px;color:#8a8a8a;border-top:1px solid #eaeaea;">
+									<tr>
+										<td style="padding:16px 0 0;">Логин</td>
+										<td align="right" style="padding:16px 0 0;color:#0a0a0a;font-weight:700;">{{UserName}}</td>
+									</tr>
+									<tr>
+										<td style="padding:10px 0 0;">Дата смены</td>
+										<td align="right" style="padding:10px 0 0;color:#0a0a0a;font-weight:700;">{{Date}}</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+
+						<tr>
+							<td style="padding:26px 40px 0 40px;">
+								<table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+									   style="background:#fffbe5;border-left:4px solid #ffcc00;">
+									<tr>
+										<td style="padding:16px 20px;font-size:13px;line-height:1.55;color:#0a0a0a;">
+											<b style="color:#0a0a0a;">Важно.</b>
+											Сохраните пароль в надёжном месте. При первом входе рекомендуется сменить его на свой.
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+
+						<tr>
+							<td style="height:36px;line-height:36px;"></td>
+						</tr>
+
+						<!-- Подвал -->
+						<tr>
+							<td style="background:#0a0a0a;padding:24px 40px;">
+								<div style="font-size:14px;color:#ffffff;font-weight:800;letter-spacing:0.5px;">
+									{{BrandHtml}}
+								</div>
+								<div style="font-size:12px;color:#8a8a8a;margin-top:8px;line-height:1.7;">
+									<a href="{{CompanySiteUrl}}" target="_blank"
+									   style="color:#ffcc00;text-decoration:none;font-weight:600;">{{CompanySite}}</a>
+									&nbsp;·&nbsp;
+									<a href="mailto:{{CompanyEmail}}"
+									   style="color:#8a8a8a;text-decoration:none;">{{CompanyEmail}}</a>
+									&nbsp;·&nbsp;
+									<span style="color:#8a8a8a;">{{CompanyPhone}}</span>
+								</div>
+								<div style="font-size:11px;color:#666666;margin-top:12px;">
+									Это автоматическое сообщение. Пожалуйста, не отвечайте на него.
+								</div>
+							</td>
+						</tr>
+
+					</table>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
