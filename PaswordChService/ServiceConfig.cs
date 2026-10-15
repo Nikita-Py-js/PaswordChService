@@ -34,14 +34,14 @@ namespace PaswordChService
         // ================================================================
         //  [Users]
         // ================================================================
-        public string Mode { get; set; } = "Local";   // Local | AD
+        public string Mode { get; set; } = "Local";
         public string Domain { get; set; } = "";
         public string AdAdminUser { get; set; } = "";
         public string AdAdminPassword { get; set; } = "";
         public int PasswordLength { get; set; } = 12;
 
         // ================================================================
-        //  [Paths] — опционально. Если не задано — берётся из Paths.cs
+        //  [Paths] — опционально. Пустое значение = взять из Paths.cs
         // ================================================================
         public string CsvPath { get; set; } = "";
         public string ArchivePath { get; set; } = "";
@@ -90,7 +90,6 @@ namespace PaswordChService
             return ProtectedUsers.Any(p => string.Equals(ShortName(p), u, StringComparison.OrdinalIgnoreCase));
         }
 
-        /// <summary>Отрезает домен: "DOMAIN\user" → "user".</summary>
         public static string ShortName(string full)
         {
             if (string.IsNullOrEmpty(full)) return full;
@@ -109,7 +108,7 @@ namespace PaswordChService
 
             var ini = new INIManager(iniPath);
 
-            return new ServiceConfig
+            var cfg = new ServiceConfig
             {
                 // [Branding]
                 CompanyBrandHtml = ini.ReadString("Branding", "CompanyBrandHtml",
@@ -143,7 +142,7 @@ namespace PaswordChService
                 AdAdminPassword = DecryptSafe(ini.ReadString("Users", "AdAdminPassword", "")),
                 PasswordLength = ini.ReadInt("Users", "PasswordLength", 12),
 
-                // [Paths] — пустые значения = использовать дефолты из Paths.cs
+                // [Paths]
                 CsvPath = ini.ReadString("Paths", "CsvPath", ""),
                 ArchivePath = ini.ReadString("Paths", "ArchivePath", ""),
                 LogPath = ini.ReadString("Paths", "LogPath", ""),
@@ -167,13 +166,22 @@ namespace PaswordChService
                 Managers = SplitList(ini.ReadString("Access", "Managers", "")),
                 ProtectedUsers = SplitList(ini.ReadString("Access", "ProtectedUsers", "Administrator")),
             };
+
+            // ============================================================
+            //  Финальная подстановка путей: если пусто — берём из Paths.cs
+            // ============================================================
+            cfg.CsvPath = UseOr(cfg.CsvPath, Paths.CsvPath);
+            cfg.ArchivePath = UseOr(cfg.ArchivePath, Paths.ArchiveDir);
+            cfg.LogPath = UseOr(cfg.LogPath, Paths.LogsDir);
+            cfg.ErrorUsersPath = UseOr(cfg.ErrorUsersPath, Paths.ErrorsDir);
+
+            return cfg;
         }
 
         // ================================================================
         //  Шифрование секретов в my.ini
         // ================================================================
 
-        /// <summary>Список секретных полей в my.ini.</summary>
         public static readonly (string Section, string Key)[] SecretKeys = new[]
         {
             ("Users",   "AdAdminPassword"),
@@ -181,10 +189,6 @@ namespace PaswordChService
             ("Mail",    "SmtpPassword"),
         };
 
-        /// <summary>
-        /// Шифрует открытые секреты в my.ini «на месте» и возвращает количество
-        /// изменённых полей. Уже зашифрованные (ENC:) и пустые — пропускаются.
-        /// </summary>
         public static int SealSecrets(string iniPath)
         {
             if (!File.Exists(iniPath))
@@ -207,10 +211,6 @@ namespace PaswordChService
             return count;
         }
 
-        /// <summary>
-        /// Расшифровывает ENC:-значения в my.ini обратно в открытый текст.
-        /// Возвращает количество изменённых полей.
-        /// </summary>
         public static int UnsealSecrets(string iniPath)
         {
             if (!File.Exists(iniPath))
@@ -236,6 +236,12 @@ namespace PaswordChService
         // ================================================================
         //  Внутреннее
         // ================================================================
+
+        /// <summary>Возвращает value, если оно непустое; иначе — fallback.</summary>
+        private static string UseOr(string value, string fallback)
+        {
+            return string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+        }
 
         private static string DecryptSafe(string value)
         {

@@ -75,6 +75,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="docs\CHANGELOG.md" />
+    <None Include="docs\COMMANDS.md" />
+    <None Include="docs\CONFIG.md" />
+    <None Include="docs\INSTALL.md" />
+    <None Include="docs\ARCHITECTURE.md" />
+    <None Include="docs\SECURITY.md" />
     <Content Include="EmailAdmin.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -87,6 +93,8 @@
     <Content Include="ServiceUninstall.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="docs\TROUBLESHOOTING.md" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="emails.txt">
