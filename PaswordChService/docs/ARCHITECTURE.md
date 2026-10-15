@@ -64,16 +64,16 @@
 sc start PaswordChService
         │
         ▼
-┌────────────────────────┐
-│  OnStart()             │
-│                        │
-│  1. Paths.EnsureDataDirs()         │
+┌─────────────────────────────────────┐
+│  OnStart()                          │
+│                                     │
+│  1. Paths.EnsureDataDirs()          │
 │  2. Logger.Initialize(Paths.LogsDir)│
-│  3. SealSecrets(my.ini)            │ ◄── автошифрование открытых паролей
-│  4. ServiceConfig.Load(my.ini)     │
-│  5. Запуск WorkerLoop (поток)      │
-│  6. Запуск PipeServer (поток)      │
-└────────────────────────┘
+│  3. SealSecrets(my.ini)             │ ◄── автошифрование открытых паролей
+│  4. ServiceConfig.Load(my.ini)      │
+│  5. Запуск WorkerLoop (поток)       │
+│  6. Запуск PipeServer (поток)       │
+└─────────────────────────────────────┘
         │
         ▼
 ┌────────────────────────┐
