@@ -27,11 +27,11 @@
 
 ```bat
 > PaswordChService.exe whoami
-Текущий пользователь: FISH-FEED\test
+Текущий пользователь: AD-CLIENT\test
 Роль: ОБЫЧНЫЙ — может менять только свой пароль.
 
 > PaswordChService.exe change
-Пользователь: FISH-FEED\test
+Пользователь: AD-CLIENT\test
 Запрос на смену пароля для: test
 Выполняется... готово.
 
@@ -58,7 +58,7 @@
 ```bat
 > PaswordChService.exe run test admin
 
-Пользователь: FISH-FEED\efsol_dc
+Пользователь: AD-CLIENT\efsol_dc
 Запрос: сменить пароли для test, admin (через службу)
 
 ================ РЕЗУЛЬТАТЫ ================
