@@ -3,7 +3,6 @@
 [![.NET Framework](https://img.shields.io/badge/.NET%20Framework-4.8-blue.svg)](https://dotnet.microsoft.com/download/dotnet-framework/net48)
 [![Platform](https://img.shields.io/badge/platform-Windows%20Server%202016%2B-lightgrey.svg)](#системные-требования)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-![Build](https://github.com/Nikita-Py-js/PaswordChService/actions/workflows/build.yml/badge.svg)
 
 ---
 
