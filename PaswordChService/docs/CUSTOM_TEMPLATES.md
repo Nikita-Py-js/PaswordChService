@@ -212,111 +212,8 @@ notepad "C:\Program Files\PaswordCh\EmailUser.html"
 
 ### 2. Замените содержимое
 
-```html
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Смена пароля</title>
-</head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:'Segoe UI',Arial,sans-serif;color:#111;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-         style="background:#f5f5f5;padding:40px 12px;">
-    <tr>
-      <td align="center">
-        <table role="presentation" width="560" cellpadding="0" cellspacing="0"
-               style="max-width:560px;width:100%;background:#ffffff;box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+html
 
-          <!-- Оранжевая полоса сверху -->
-          <tr>
-            <td style="background:#ff4d1c;height:4px;line-height:4px;font-size:0;">&nbsp;</td>
-          </tr>
-
-          <!-- Заголовок -->
-          <tr>
-            <td style="padding:32px 40px 0 40px;">
-              <div style="font-size:22px;font-weight:800;color:#111;">
-                {{CompanyName}}
-              </div>
-              <div style="font-size:13px;color:#888;margin-top:4px;">
-                Уведомление о смене пароля
-              </div>
-            </td>
-          </tr>
-
-          <!-- Приветствие -->
-          <tr>
-            <td style="padding:28px 40px 0 40px;">
-              <p style="margin:0;font-size:16px;color:#111;line-height:1.5;">
-                {{Greeting}}
-              </p>
-              <p style="margin:12px 0 0;font-size:15px;color:#444;line-height:1.6;">
-                Для вашей учётной записи <b>{{UserName}}</b> установлен новый пароль.
-              </p>
-            </td>
-          </tr>
-
-          <!-- Пароль -->
-          <tr>
-            <td style="padding:24px 40px 0 40px;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
-                     style="background:#fff5f2;border-left:4px solid #ff4d1c;">
-                <tr>
-                  <td style="padding:18px 20px;">
-                    <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#ff4d1c;font-weight:700;">
-                      Новый пароль
-                    </div>
-                    <div style="margin-top:8px;font-family:Consolas,monospace;font-size:24px;font-weight:700;color:#111;word-break:break-all;">
-                      {{NewPassword}}
-                    </div>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Дата -->
-          <tr>
-            <td style="padding:20px 40px 0 40px;font-size:13px;color:#888;">
-              Дата смены: <b style="color:#111;">{{Date}}</b>
-            </td>
-          </tr>
-
-          <!-- Предупреждение -->
-          <tr>
-            <td style="padding:24px 40px 0 40px;">
-              <div style="font-size:13px;line-height:1.6;color:#666;">
-                Сохраните пароль в надёжном месте. При первом входе рекомендуется сменить его на свой.
-              </div>
-            </td>
-          </tr>
-
-          <tr><td style="height:36px;line-height:36px;"></td></tr>
-
-          <!-- Подвал -->
-          <tr>
-            <td style="background:#fafafa;border-top:1px solid #eee;padding:22px 40px;font-size:12px;color:#888;line-height:1.7;">
-              <a href="{{CompanySiteUrl}}" target="_blank"
-                 style="color:#ff4d1c;text-decoration:none;font-weight:600;">{{CompanySite}}</a>
-              &nbsp;·&nbsp;
-              <a href="mailto:{{CompanyEmail}}"
-                 style="color:#888;text-decoration:none;">{{CompanyEmail}}</a>
-              &nbsp;·&nbsp;
-              <span>{{CompanyPhone}}</span>
-              <div style="margin-top:10px;font-size:11px;color:#bbb;">
-                Это автоматическое сообщение. Пожалуйста, не отвечайте на него.
-              </div>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-```
 
 ### 3. Сохраните файл **в UTF-8 без BOM**
 
@@ -446,7 +343,7 @@ sc start PaswordChService
 
 Служба **не изменяет** ваши HTML-файлы. Что положили — то и отправится. Если добавите новые плейсхолдеры, которых нет в коде, они останутся в письме как есть (`{{MyCustom}}`) — так проще заметить опечатку.
 
-Если хотите новые плейсхолдеры — их нужно добавить в `EmailSender.cs` в словарь `CommonBrandValues()`. Пришлите список — доработаю.
+Если хотите новые плейсхолдеры — их нужно добавить в `EmailSender.cs` в словарь `CommonBrandValues()`.
 
 ---
 
