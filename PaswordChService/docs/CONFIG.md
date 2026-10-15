@@ -26,8 +26,8 @@
 | `CompanySite` | (пусто) | Сайт в подвале |
 | `CompanyEmail` | (пусто) | Email в подвале |
 | `CompanyPhone` | (пусто) | Телефон в подвале |
-| `VendorLine` | `Решение компании ООО «Реумент»` | Строка вендора |
-| `VendorUrl` | `https://reument.ru` | URL вендора |
+| `VendorLine` | (пусто) | Строка вендора |
+| `VendorUrl` | (пусто) | URL вендора |
 | `EmailUserSubject` | `Смена пароля` | Тема письма пользователю |
 | `EmailAdminSubject` | `PaswordCh: отчёт о смене паролей` | Тема отчёта админам |
 
