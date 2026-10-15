@@ -115,35 +115,6 @@ EventLog: **Просмотр событий → Журналы Windows → Пр�
 
 ---
 
-## Миграция с `C:\PaswordCh\`
-
-Если у вас была установлена предыдущая версия (данные в `C:\PaswordCh\`):
-
-```bat
-:: От админа. Сначала расшифровать секреты, если планируете перенос на другой сервер.
-C:\PaswordCh\PaswordChService.exe unseal
-
-:: Скопировать данные
-xcopy /E /I /Y "C:\PaswordCh\my.ini"       "C:\Program Files\PaswordCh\"
-xcopy /E /I /Y "C:\PaswordCh\emails.csv"   "C:\Program Files\PaswordCh\"
-xcopy /E /I /Y "C:\PaswordCh\Logs\*"       "C:\Program Files\PaswordCh\Logs\"
-xcopy /E /I /Y "C:\PaswordCh\Archive\*"    "C:\Program Files\PaswordCh\Archive\"
-xcopy /E /I /Y "C:\PaswordCh\ErrorUsers\*" "C:\Program Files\PaswordCh\ErrorUsers\"
-
-:: Удалить старую службу
-C:\PaswordCh\PaswordChService.exe uninstall
-
-:: Установить новую
-ServiceInstall.bat
-
-:: Удалить старый каталог
-rmdir /S /Q C:\PaswordCh
-```
-
-При первом запуске служба автоматически зашифрует открытые пароли в новом `my.ini`.
-
----
-
 ## Обновление бинарника
 
 ```bat
@@ -177,6 +148,7 @@ sc stop PaswordChService
 "C:\Program Files\PaswordCh\PaswordChService.exe" uninstall
 rmdir /S /Q "C:\Program Files\PaswordCh"
 ```
+
 
 ---
 
