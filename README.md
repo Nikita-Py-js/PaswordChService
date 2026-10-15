@@ -56,9 +56,4 @@
 
 ---
 
-## Контакты
-
-- **Разработчик:** ООО «Реумент»
-- **Сайт:** [reument.ru](https://reument.ru)
-- **Email:** n.lobov@efsol.ru
 - **Issues:** через GitHub Issues репозитория
