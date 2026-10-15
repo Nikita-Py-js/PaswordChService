@@ -107,9 +107,3 @@ ServiceInstall.bat
 ## Лицензия
 
 MIT. См. файл [LICENSE](LICENSE).
-
----
-
-## Автор
-
-Разработано ООО «Реумент» — https://reument.ru
