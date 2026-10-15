@@ -40,7 +40,7 @@
 
 Полная документация — установка, конфигурация, команды, архитектура, безопасность, troubleshooting — в основном файле:
 
-### → [README.md](README.md)
+### → [PaswordChService/README.md](PaswordChService/README.md)
 
 Быстрые ссылки на разделы документации:
 
