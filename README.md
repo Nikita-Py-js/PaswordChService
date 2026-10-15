@@ -1,8 +1,8 @@
 # PaswordChService
 
-> **Лицензия:** MIT  
-> **Платформа:** Windows Server 2016+ / Windows 10/11, .NET Framework 4.8
-
+[![.NET Framework](https://img.shields.io/badge/.NET%20Framework-4.8-blue.svg)](https://dotnet.microsoft.com/download/dotnet-framework/net48)
+[![Platform](https://img.shields.io/badge/platform-Windows%20Server%202016%2B-lightgrey.svg)](#системные-требования)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 ---
 
 ## Зачем этот проект
