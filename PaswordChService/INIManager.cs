@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace PaswordChService
@@ -10,6 +9,7 @@ namespace PaswordChService
     /// Читает/пишет INI-файл с автоопределением кодировки
     /// (UTF-8, UTF-8 BOM, UTF-16 LE/BE BOM, Windows-1251).
     /// Запись «на месте» — сохраняет комментарии и структуру файла.
+    /// Потокобезопасен, не ломает ini 
     /// </summary>
     public class INIManager
     {
@@ -88,6 +88,10 @@ namespace PaswordChService
             catch { }
         }
 
+        /// <summary>
+        /// Перечитывает INI-файл с диска и заново заполняет внутренний кеш секций и ключей.
+        /// Если файла нет — кеш очищается, метка времени сбрасывается.
+        /// </summary>
         private void Reload()
         {
             _data = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);

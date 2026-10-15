@@ -15,11 +15,15 @@ namespace PaswordChService
 
         public EmailSender(ServiceConfig cfg) { _cfg = cfg; }
 
-        // ---------- Публичные API ----------
+        // ================================================================
+        //  Публичные API
+        // ================================================================
 
+        /// <summary>Простое текстовое письмо (для обратной совместимости).</summary>
         public void Send(string to, string subject, string body)
             => SendMessage(to, subject, body, isHtml: false);
 
+        /// <summary>HTML-письмо пользователю с новым паролем.</summary>
         public void SendUserPassword(string to, string userName, string newPassword)
         {
             string html;
@@ -30,12 +34,29 @@ namespace PaswordChService
             catch (Exception ex)
             {
                 Logger.Error("Не удалось построить HTML-письмо пользователю, отправляю текстом", ex);
-                Send(to, "Смена пароля", $"Ваш новый пароль: {newPassword}");
+
+                var subjFallback = RenderSubject(_cfg.EmailUserSubject, new Dictionary<string, string>
+                {
+                    { "UserName",          userName },
+                    { "ClientCompanyName", EffectiveClientName },
+                    { "CompanyName",       _cfg.CompanyName },
+                });
+
+                Send(to, subjFallback, $"Ваш новый пароль: {newPassword}");
                 return;
             }
-            SendMessage(to, "Смена пароля", html, isHtml: true);
+
+            var subject = RenderSubject(_cfg.EmailUserSubject, new Dictionary<string, string>
+            {
+                { "UserName",          userName },
+                { "ClientCompanyName", EffectiveClientName },
+                { "CompanyName",       _cfg.CompanyName },
+            });
+
+            SendMessage(to, subject, html, isHtml: true);
         }
 
+        /// <summary>HTML-отчёт администраторам о результате цикла.</summary>
         public void SendAdminReport(List<PasswordChangeResult> successes,
                                      List<PasswordChangeResult> errors,
                                      DateTime nextRun)
@@ -53,13 +74,21 @@ namespace PaswordChService
                 return;
             }
 
+            var subject = RenderSubject(_cfg.EmailAdminSubject, new Dictionary<string, string>
+            {
+                { "ClientCompanyName", EffectiveClientName },
+                { "CompanyName",       _cfg.CompanyName },
+                { "TotalSuccess",      successes.Count.ToString() },
+                { "TotalErrors",       errors.Count.ToString() },
+            });
+
             foreach (var a in _cfg.AdminEmails)
             {
                 var to = a.Trim();
                 if (to.Length == 0) continue;
                 try
                 {
-                    SendMessage(to, "PaswordCh: отчёт о смене паролей", html, isHtml: true);
+                    SendMessage(to, subject, html, isHtml: true);
                     Logger.Info("HTML-отчёт отправлен: " + to);
                 }
                 catch (Exception ex)
@@ -70,6 +99,7 @@ namespace PaswordChService
             }
         }
 
+        /// <summary>Устаревший текстовый notify (оставлен для совместимости).</summary>
         public void NotifyAdmins(string subject, string body)
         {
             foreach (var a in _cfg.AdminEmails)
@@ -82,7 +112,9 @@ namespace PaswordChService
             }
         }
 
-        // ---------- Отправка с retry ----------
+        // ================================================================
+        //  Отправка с retry
+        // ================================================================
 
         private void SendMessage(string to, string subject, string body, bool isHtml)
         {
@@ -104,7 +136,8 @@ namespace PaswordChService
                     if (attempt < RetryDelaysSeconds.Length)
                     {
                         var delay = RetryDelaysSeconds[attempt];
-                        Logger.Warn($"Временная ошибка SMTP при отправке на {to}: {ex.Message}. Повтор через {delay} с...");
+                        Logger.Warn($"Временная ошибка SMTP при отправке на {to}: {ex.Message}. " +
+                                    $"Повтор через {delay} с...");
                         Thread.Sleep(delay * 1000);
                     }
                 }
@@ -157,7 +190,15 @@ namespace PaswordChService
             }
         }
 
-        // ---------- Построение HTML ----------
+        // ================================================================
+        //  Утилиты
+        // ================================================================
+
+        /// <summary>Имя компании клиента. Если не задано — берём CompanyName.</summary>
+        private string EffectiveClientName =>
+            string.IsNullOrWhiteSpace(_cfg.ClientCompanyName)
+                ? _cfg.CompanyName
+                : _cfg.ClientCompanyName;
 
         /// <summary>Гарантирует наличие схемы в URL.</summary>
         private static string NormalizeUrl(string url)
@@ -170,7 +211,27 @@ namespace PaswordChService
             return "https://" + u;
         }
 
-        /// <summary>Общий набор подстановок для шапки/подвала.</summary>
+        /// <summary>
+        /// Подставляет плейсхолдеры {{Key}} в строку темы.
+        /// Если значение не передано — плейсхолдер остаётся как есть.
+        /// </summary>
+        private static string RenderSubject(string template, IDictionary<string, string> values)
+        {
+            if (string.IsNullOrEmpty(template)) return template ?? "";
+            var sb = new StringBuilder(template);
+            if (values != null)
+            {
+                foreach (var kv in values)
+                    sb.Replace("{{" + kv.Key + "}}", kv.Value ?? "");
+            }
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Общий набор подстановок для шапки/подвала/тела писем.
+        /// {{BrandHtml}} — вставляется как есть, без экранирования (пользовательский HTML).
+        /// Остальное — экранируется.
+        /// </summary>
         private Dictionary<string, string> CommonBrandValues()
         {
             var siteUrl = NormalizeUrl(_cfg.CompanySite);
@@ -178,21 +239,22 @@ namespace PaswordChService
 
             return new Dictionary<string, string>
             {
-                // {{BrandHtml}} — БЕЗ экранирования, пользователь вставляет свой HTML.
-                { "BrandHtml",      _cfg.CompanyBrandHtml ?? "" },
-
-                // {{CompanyName}} и остальные — с экранированием.
-                { "CompanyName",    EmailTemplate.Html(_cfg.CompanyName) },
-                { "CompanyTagline", EmailTemplate.Html(_cfg.CompanyTagline) },
-                { "CompanySite",    EmailTemplate.Html(_cfg.CompanySite) },
-                { "CompanySiteUrl", EmailTemplate.Html(siteUrl) },
-                { "CompanyEmail",   EmailTemplate.Html(_cfg.CompanyEmail) },
-                { "CompanyPhone",   EmailTemplate.Html(_cfg.CompanyPhone) },
-                { "VendorLine",     EmailTemplate.Html(_cfg.VendorLine) },
-                { "VendorUrl",      EmailTemplate.Html(vendorUrl) }
-
+                { "BrandHtml",          _cfg.CompanyBrandHtml ?? "" },
+                { "CompanyName",        EmailTemplate.Html(_cfg.CompanyName) },
+                { "ClientCompanyName",  EmailTemplate.Html(EffectiveClientName) },
+                { "CompanyTagline",     EmailTemplate.Html(_cfg.CompanyTagline) },
+                { "CompanySite",        EmailTemplate.Html(_cfg.CompanySite) },
+                { "CompanySiteUrl",     EmailTemplate.Html(siteUrl) },
+                { "CompanyEmail",       EmailTemplate.Html(_cfg.CompanyEmail) },
+                { "CompanyPhone",       EmailTemplate.Html(_cfg.CompanyPhone) },
+                { "VendorLine",         EmailTemplate.Html(_cfg.VendorLine) },
+                { "VendorUrl",          EmailTemplate.Html(vendorUrl) },
             };
         }
+
+        // ================================================================
+        //  Построение HTML
+        // ================================================================
 
         private string BuildUserEmail(string userName, string newPassword)
         {

@@ -17,7 +17,9 @@ namespace PaswordChService
         public bool Success { get; set; }
         public string Error { get; set; }
     }
-
+    /// <summary>
+    /// Отсновной конвеер службы
+    /// </summary>
     public class EventProcessor
     {
         private readonly ServiceConfig _cfg;
@@ -211,7 +213,10 @@ namespace PaswordChService
             Logger.Info($"=== Цикл завершён. Успешно: {successes.Count}, ошибок: {errors.Count} ===");
             return results.OrderBy(r => r.Username).ToList();
         }
-
+        /// <summary>
+        /// Политика поролей
+        /// Обязательное присутвие цифр, букв и символов
+        /// </summary>
         private static string GeneratePassword(int length)
         {
             const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";

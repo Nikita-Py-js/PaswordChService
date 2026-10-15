@@ -7,38 +7,55 @@ namespace PaswordChService
     /// <summary>Конфигурация службы, загружаемая из my.ini.</summary>
     public class ServiceConfig
     {
-        // [Branding]
+        // ================================================================
+        //  [Branding]
+        // ================================================================
         public string CompanyBrandHtml { get; set; } = "<span>EFSOL</span>";
         public string CompanyName { get; set; } = "EFSOL";
+        public string ClientCompanyName { get; set; } = "";
         public string CompanyTagline { get; set; } = "";
         public string CompanySite { get; set; } = "";
         public string CompanyEmail { get; set; } = "";
         public string CompanyPhone { get; set; } = "";
+
         public string VendorLine { get; set; } = "Решение компании ООО «Реумент»";
         public string VendorUrl { get; set; } = "https://reument.ru";
 
-        // [Service]
+        public string EmailUserSubject { get; set; } = "Смена пароля";
+        public string EmailAdminSubject { get; set; } = "PaswordCh: отчёт о смене паролей";
+
+        // ================================================================
+        //  [Service]
+        // ================================================================
         public int IntervalDays { get; set; } = 30;
         public int CheckIntervalMinutes { get; set; } = 15;
         public int LogArchiveHours { get; set; } = 24;
 
-        // [Users]
-        public string Mode { get; set; } = "Local";
+        // ================================================================
+        //  [Users]
+        // ================================================================
+        public string Mode { get; set; } = "Local";   // Local | AD
         public string Domain { get; set; } = "";
         public string AdAdminUser { get; set; } = "";
         public string AdAdminPassword { get; set; } = "";
         public int PasswordLength { get; set; } = 12;
 
-        // [Paths]
-        public string CsvPath { get; set; } = @"C:\PaswordCh\emails.csv";
-        public string ArchivePath { get; set; } = @"C:\PaswordCh\Archive";
-        public string LogPath { get; set; } = @"C:\PaswordCh\Logs";
-        public string ErrorUsersPath { get; set; } = @"C:\PaswordCh\ErrorUsers";
+        // ================================================================
+        //  [Paths] — опционально. Если не задано — берётся из Paths.cs
+        // ================================================================
+        public string CsvPath { get; set; } = "";
+        public string ArchivePath { get; set; } = "";
+        public string LogPath { get; set; } = "";
+        public string ErrorUsersPath { get; set; } = "";
 
-        // [Archive]
+        // ================================================================
+        //  [Archive]
+        // ================================================================
         public string ZipPassword { get; set; } = "ChangeMe";
 
-        // [Mail]
+        // ================================================================
+        //  [Mail]
+        // ================================================================
         public string[] AdminEmails { get; set; } = new string[0];
         public string SmtpHost { get; set; } = "";
         public int SmtpPort { get; set; } = 25;
@@ -49,11 +66,15 @@ namespace PaswordChService
         public bool SendEmailsToUsers { get; set; } = false;
         public int SmtpTimeoutMs { get; set; } = 30000;
 
-        // [Access]
+        // ================================================================
+        //  [Access]
+        // ================================================================
         public string[] Managers { get; set; } = new string[0];
         public string[] ProtectedUsers { get; set; } = new string[0];
 
-        // ---------- Роли ----------
+        // ================================================================
+        //  Роли
+        // ================================================================
 
         public bool IsManager(string user)
         {
@@ -69,6 +90,7 @@ namespace PaswordChService
             return ProtectedUsers.Any(p => string.Equals(ShortName(p), u, StringComparison.OrdinalIgnoreCase));
         }
 
+        /// <summary>Отрезает домен: "DOMAIN\user" → "user".</summary>
         public static string ShortName(string full)
         {
             if (string.IsNullOrEmpty(full)) return full;
@@ -76,7 +98,9 @@ namespace PaswordChService
             return i >= 0 ? full.Substring(i + 1) : full;
         }
 
-        // ---------- Загрузка ----------
+        // ================================================================
+        //  Загрузка
+        // ================================================================
 
         public static ServiceConfig Load(string iniPath)
         {
@@ -84,18 +108,28 @@ namespace PaswordChService
                 throw new FileNotFoundException("Файл конфигурации не найден: " + iniPath, iniPath);
 
             var ini = new INIManager(iniPath);
+
             return new ServiceConfig
             {
                 // [Branding]
                 CompanyBrandHtml = ini.ReadString("Branding", "CompanyBrandHtml",
-                                                  "<span style=\"color:#ffffff;\">EFSOL</span>"),
+                                                   "<span style=\"color:#ffffff;\">EFSOL</span>"),
                 CompanyName = ini.ReadString("Branding", "CompanyName", "EFSOL"),
+                ClientCompanyName = ini.ReadString("Branding", "ClientCompanyName", ""),
                 CompanyTagline = ini.ReadString("Branding", "CompanyTagline", ""),
                 CompanySite = ini.ReadString("Branding", "CompanySite", ""),
                 CompanyEmail = ini.ReadString("Branding", "CompanyEmail", ""),
                 CompanyPhone = ini.ReadString("Branding", "CompanyPhone", ""),
-                VendorLine = ini.ReadString("Branding", "VendorLine", "Решение компании ООО «Реумент»"),
-                VendorUrl = ini.ReadString("Branding", "VendorUrl", "https://reument.ru"),
+
+                VendorLine = ini.ReadString("Branding", "VendorLine",
+                                                   "Решение компании ООО «Реумент»"),
+                VendorUrl = ini.ReadString("Branding", "VendorUrl",
+                                                   "https://reument.ru"),
+
+                EmailUserSubject = ini.ReadString("Branding", "EmailUserSubject",
+                                                   "Смена пароля"),
+                EmailAdminSubject = ini.ReadString("Branding", "EmailAdminSubject",
+                                                   "PaswordCh: отчёт о смене паролей"),
 
                 // [Service]
                 IntervalDays = ini.ReadInt("Service", "IntervalDays", 30),
@@ -109,12 +143,11 @@ namespace PaswordChService
                 AdAdminPassword = DecryptSafe(ini.ReadString("Users", "AdAdminPassword", "")),
                 PasswordLength = ini.ReadInt("Users", "PasswordLength", 12),
 
-                // [Paths]
-                // [Paths] — если ключ отсутствует или пустой, берём значение из Paths.cs
-                CsvPath = ReadPathOr(ini, "Paths", "CsvPath", Paths.CsvPath),
-                ArchivePath = ReadPathOr(ini, "Paths", "ArchivePath", Paths.ArchiveDir),
-                LogPath = ReadPathOr(ini, "Paths", "LogPath", Paths.LogsDir),
-                ErrorUsersPath = ReadPathOr(ini, "Paths", "ErrorUsersPath", Paths.ErrorsDir),
+                // [Paths] — пустые значения = использовать дефолты из Paths.cs
+                CsvPath = ini.ReadString("Paths", "CsvPath", ""),
+                ArchivePath = ini.ReadString("Paths", "ArchivePath", ""),
+                LogPath = ini.ReadString("Paths", "LogPath", ""),
+                ErrorUsersPath = ini.ReadString("Paths", "ErrorUsersPath", ""),
 
                 // [Archive]
                 ZipPassword = DecryptSafe(ini.ReadString("Archive", "ZipPassword", "ChangeMe")),
@@ -136,14 +169,9 @@ namespace PaswordChService
             };
         }
 
-        private static string ReadPathOr(INIManager ini, string section, string key, string defaultValue)
-        {
-            var v = ini.ReadString(section, key, "").Trim();
-            return string.IsNullOrEmpty(v) ? defaultValue : v;
-        }
-
-
-        // ---------- Шифрование секретов в my.ini ----------
+        // ================================================================
+        //  Шифрование секретов в my.ini
+        // ================================================================
 
         /// <summary>Список секретных полей в my.ini.</summary>
         public static readonly (string Section, string Key)[] SecretKeys = new[]
@@ -154,8 +182,8 @@ namespace PaswordChService
         };
 
         /// <summary>
-        /// Шифрует открытые секреты в my.ini «на месте» и возвращает количество изменённых полей.
-        /// Уже зашифрованные (ENC:) и пустые — пропускаются.
+        /// Шифрует открытые секреты в my.ini «на месте» и возвращает количество
+        /// изменённых полей. Уже зашифрованные (ENC:) и пустые — пропускаются.
         /// </summary>
         public static int SealSecrets(string iniPath)
         {
@@ -205,7 +233,9 @@ namespace PaswordChService
             return count;
         }
 
-        // ---------- Внутреннее ----------
+        // ================================================================
+        //  Внутреннее
+        // ================================================================
 
         private static string DecryptSafe(string value)
         {
