@@ -1,1 +1,1 @@
-Старт — [PaswordChService/README.md]
+[Документация](PaswordChService/README.md)
