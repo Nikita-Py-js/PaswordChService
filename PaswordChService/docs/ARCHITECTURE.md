@@ -141,7 +141,7 @@ ID|<DOMAIN\user>
 ### Пример сессии
 
 ```
-C → ID|REUMENT-DEV-NOD\Администратор
+C → ID|REUMENT-DEV-NODE-01\Администратор
 C → CHANGE|test
 S → OK|Kd8#nQp3Wm2x
 C → QUIT
