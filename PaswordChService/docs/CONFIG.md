@@ -193,7 +193,7 @@ ArchivePath=D:\PaswordChBackup\Archive
 ```ini
 [OneTimePassword]
 UseApi=true
-ApiUrl=https://localhost:4431/passwordapi
+ApiUrl=https://localhost/passwordapi
 ApiKey=ваш-ключ
 PublicBaseUrl=https://client.as.esit.info/passwordapi
 TtlMinutes=1440
