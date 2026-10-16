@@ -18,7 +18,7 @@
 
 ## Связанные документы
 
-Графический клиент службы [PaswordChService](https://github.com/Nikita-Py-js/PaswordChService). Позволяет менять пароли пользователей без командной строки.
+[Графический клиент](https://github.com/Nikita-Py-js/PaswordChService) службы PaswordChService. Позволяет менять пароли пользователей без командной строки.
 
 ---
 
