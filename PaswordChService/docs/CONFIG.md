@@ -174,7 +174,31 @@ ProtectedUsers=Administrator;efsol_it;efsol_dc
 [Paths]
 ArchivePath=D:\PaswordChBackup\Archive
 ```
+## [OneTimePassword]
 
+Настройки интеграции с API одноразовых паролей. Если `UseApi=true`, письма пользователям будут содержать не сам пароль, а одноразовую ссылку.
+
+| Ключ | По умолчанию | Описание |
+|---|---|---|
+| `UseApi` | `false` | Использовать API одноразовых паролей |
+| `ApiUrl` | (пусто) | URL корня API, например `https://localhost:4431/passwordapi` |
+| `ApiKey` | (пусто) | Ключ API из `Web.config` веб-сервиса |
+| `PublicBaseUrl` | (пусто) | Публичный адрес для ссылок в письмах (если пусто — берётся из ответа API) |
+| `TtlMinutes` | `1440` | Время жизни ссылки в минутах (по умолчанию 24 часа) |
+| `FallbackToPlain` | `true` | Отправлять обычное письмо с паролем при сбое API |
+| `IgnoreSslErrors` | `false` | Игнорировать ошибки валидации SSL-сертификата (для самоподписанных) |
+
+### Пример
+
+```ini
+[OneTimePassword]
+UseApi=true
+ApiUrl=https://localhost:4431/passwordapi
+ApiKey=ваш-ключ
+PublicBaseUrl=https://reument.ru/passwordapi
+TtlMinutes=1440
+FallbackToPlain=true
+IgnoreSslErrors=false
 ---
 
 ## Шифрование секретов
