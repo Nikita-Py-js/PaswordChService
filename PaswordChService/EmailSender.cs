@@ -269,6 +269,52 @@ namespace PaswordChService
             return EmailTemplate.Render(tpl, values);
         }
 
+        /// <summary>HTML-письмо пользователю со ссылкой на одноразовый пароль.</summary>
+        public void SendUserPasswordLink(string to, string userName, string passwordUrl)
+        {
+            string html;
+            try
+            {
+                html = BuildUserEmailLink(userName, passwordUrl);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Не удалось построить HTML-письмо (ссылка), отправляю текстом", ex);
+
+                var subjFallback = RenderSubject(_cfg.EmailUserSubject, new Dictionary<string, string>
+        {
+            { "UserName",          userName },
+            { "ClientCompanyName", EffectiveClientName },
+            { "CompanyName",       _cfg.CompanyName },
+        });
+
+                Send(to, subjFallback, "Ссылка для получения пароля (действует один раз): " + passwordUrl);
+                return;
+            }
+
+            var subject = RenderSubject(_cfg.EmailUserSubject, new Dictionary<string, string>
+    {
+        { "UserName",          userName },
+        { "ClientCompanyName", EffectiveClientName },
+        { "CompanyName",       _cfg.CompanyName },
+    });
+
+            SendMessage(to, subject, html, isHtml: true);
+        }
+
+        private string BuildUserEmailLink(string userName, string passwordUrl)
+        {
+            var tpl = EmailTemplate.Load("EmailUserLink.html");
+
+            var values = CommonBrandValues();
+            values["Greeting"] = "Здравствуйте, " + EmailTemplate.Html(userName) + "!";
+            values["UserName"] = EmailTemplate.Html(userName);
+            values["PasswordUrl"] = EmailTemplate.Html(passwordUrl);
+            values["Date"] = DateTime.Now.ToString("dd.MM.yyyy HH:mm");
+            values["TtlMinutes"] = _cfg.OtpApiTtlMinutes.ToString();
+
+            return EmailTemplate.Render(tpl, values);
+        }
         private string BuildAdminEmail(List<PasswordChangeResult> successes,
                                         List<PasswordChangeResult> errors,
                                         DateTime nextRun)

@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Новый пароль</title>
+</head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:'Segoe UI',Arial,Helvetica,sans-serif;color:#0a0a0a;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+         style="background:#f5f5f5;padding:40px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="620" cellpadding="0" cellspacing="0"
+               style="max-width:620px;width:100%;background:#ffffff;border:1px solid #e8e8e8;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(10,10,10,0.06);">
+
+          <!-- Шапка -->
+          <tr>
+            <td style="background:#0a0a0a;padding:26px 36px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td valign="middle" style="font-size:26px;font-weight:800;letter-spacing:-0.5px;line-height:1;">
+                    {{BrandHtml}}
+                  </td>
+                  <td valign="middle" align="right"
+                      style="font-size:11px;color:#9ca3af;letter-spacing:1.5px;text-transform:uppercase;">
+                    Безопасность
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding-top:8px;font-size:13px;color:#bfbfbf;">{{CompanyTagline}}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Заголовок -->
+          <tr>
+            <td style="padding:28px 36px 0 36px;">
+              <div style="font-size:13px;font-weight:600;color:#ff4d1c;letter-spacing:1.5px;text-transform:uppercase;">
+                Новый пароль
+              </div>
+              <h1 style="margin:10px 0 0;font-size:26px;line-height:1.25;font-weight:800;color:#0a0a0a;letter-spacing:-0.3px;">
+                {{Greeting}}
+              </h1>
+              <p style="margin:14px 0 0;font-size:15px;line-height:1.6;color:#4b5563;">
+                Для вашей учётной записи <b style="color:#0a0a0a;">{{UserName}}</b> установлен новый пароль.
+                Чтобы получить его, перейдите по ссылке ниже.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Кнопка со ссылкой -->
+          <tr>
+            <td style="padding:26px 36px 0 36px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                     style="background:#fff7f4;border:1px solid #ffe0d4;border-radius:12px;">
+                <tr>
+                  <td style="padding:22px 24px;">
+                    <div style="font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:#ff4d1c;font-weight:700;">
+                      Одноразовая ссылка
+                    </div>
+                    <div style="margin-top:12px;font-size:13px;line-height:1.6;color:#4b5563;">
+                      Ссылка действует один раз и {{TtlMinutes}} минут. После первого открытия
+                      она уничтожается.
+                    </div>
+
+                    <!-- Кнопка -->
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:18px;">
+                      <tr>
+                        <td style="background:#ff4d1c;border-radius:8px;">
+                          <a href="{{PasswordUrl}}" target="_blank"
+                             style="display:inline-block;padding:12px 22px;font-size:14px;font-weight:700;color:#ffffff;text-decoration:none;">
+                            Открыть пароль
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Резервный URL -->
+                    <div style="margin-top:14px;font-size:11px;color:#9ca3af;line-height:1.5;word-break:break-all;">
+                      Если кнопка не работает, скопируйте ссылку в браузер:<br>
+                      <a href="{{PasswordUrl}}" target="_blank"
+                         style="color:#ff4d1c;text-decoration:none;">{{PasswordUrl}}</a>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Метаданные -->
+          <tr>
+            <td style="padding:24px 36px 0 36px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                     style="font-size:14px;color:#6b7280;border-top:1px solid #eeeeee;">
+                <tr>
+                  <td style="padding:14px 0 0;">Логин</td>
+                  <td align="right" style="padding:14px 0 0;color:#0a0a0a;font-weight:600;">{{UserName}}</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0 0;">Дата смены</td>
+                  <td align="right" style="padding:8px 0 0;color:#0a0a0a;font-weight:600;">{{Date}}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Предупреждение -->
+          <tr>
+            <td style="padding:22px 36px 0 36px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                     style="background:#0a0a0a;border-radius:12px;">
+                <tr>
+                  <td style="padding:16px 20px;font-size:13px;line-height:1.55;color:#ffffff;">
+                    <b style="color:#ff4d1c;">&#9888; Важно.</b>
+                    Не передавайте ссылку другим людям. Она предназначена только для вас.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr><td style="height:32px;line-height:32px;"></td></tr>
+
+          <!-- Подвал -->
+          <tr>
+            <td style="background:#fafafa;border-top:1px solid #eeeeee;padding:22px 36px;">
+              <div style="font-size:13px;color:#0a0a0a;font-weight:700;">{{CompanyName}}</div>
+              <div style="font-size:12px;color:#9ca3af;margin-top:6px;line-height:1.7;">
+                <a href="{{CompanySiteUrl}}" target="_blank"
+                   style="color:#ff4d1c;text-decoration:none;font-weight:600;">{{CompanySite}}</a>
+                &nbsp;·&nbsp;
+                <a href="mailto:{{CompanyEmail}}"
+                   style="color:#9ca3af;text-decoration:none;">{{CompanyEmail}}</a>
+                &nbsp;·&nbsp;
+                <span style="color:#9ca3af;">{{CompanyPhone}}</span>
+              </div>
+              <div style="font-size:11px;color:#c4c4c4;margin-top:10px;">
+                Это автоматическое сообщение. Пожалуйста, не отвечайте на него.
+              </div>
+              <div style="font-size:11px;color:#c4c4c4;margin-top:6px;line-height:1.6;">
+                {{VendorLine}}
+                &nbsp;·&nbsp;
+                <a href="{{VendorUrl}}" target="_blank"
+                   style="color:#9ca3af;text-decoration:none;font-weight:600;">{{VendorUrl}}</a>
+              </div>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

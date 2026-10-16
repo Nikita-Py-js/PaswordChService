@@ -73,6 +73,17 @@ namespace PaswordChService
         public string[] ProtectedUsers { get; set; } = new string[0];
 
         // ================================================================
+        //  [OneTimePassword]
+        // ================================================================
+        public bool OtpUseApi { get; set; } = false;
+        public string OtpApiUrl { get; set; } = "";
+        public string OtpApiKey { get; set; } = "";
+        public int OtpApiTtlMinutes { get; set; } = 1440;
+        public bool OtpFallbackToPlain { get; set; } = true;
+        public string OtpPublicBaseUrl { get; set; } = "";
+        public bool OtpIgnoreSslErrors { get; set; } = false;
+
+        // ================================================================
         //  Роли
         // ================================================================
 
@@ -121,9 +132,9 @@ namespace PaswordChService
                 CompanyPhone = ini.ReadString("Branding", "CompanyPhone", ""),
 
                 VendorLine = ini.ReadString("Branding", "VendorLine",
-                                                   "Решение компании ООО «Реумент»"),
+                                                   ""),
                 VendorUrl = ini.ReadString("Branding", "VendorUrl",
-                                                   "https://reument.ru"),
+                                                   ""),
 
                 EmailUserSubject = ini.ReadString("Branding", "EmailUserSubject",
                                                    "Смена пароля"),
@@ -165,6 +176,20 @@ namespace PaswordChService
                 // [Access]
                 Managers = SplitList(ini.ReadString("Access", "Managers", "")),
                 ProtectedUsers = SplitList(ini.ReadString("Access", "ProtectedUsers", "Administrator")),
+
+                // [OneTimePassword]
+                OtpUseApi = ini.ReadBool("OneTimePassword", "UseApi", false),
+                OtpApiUrl = ini.ReadString("OneTimePassword", "ApiUrl", ""),
+                OtpApiKey = ini.ReadString("OneTimePassword", "ApiKey", ""),
+                OtpApiTtlMinutes = ini.ReadInt("OneTimePassword", "TtlMinutes", 1440),
+                OtpFallbackToPlain = ini.ReadBool("OneTimePassword", "FallbackToPlain", true),
+                OtpPublicBaseUrl = ini.ReadString("OneTimePassword", "PublicBaseUrl", ""),
+                OtpIgnoreSslErrors = ini.ReadBool("OneTimePassword", "IgnoreSslErrors", false),
+
+
+
+
+
             };
 
             // ============================================================

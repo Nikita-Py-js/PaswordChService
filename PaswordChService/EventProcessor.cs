@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace PaswordChService
 {
+    /// <summary>Результат смены пароля по одному пользователю.</summary>
     public class PasswordChangeResult
     {
         public string Username { get; set; }
@@ -17,9 +18,8 @@ namespace PaswordChService
         public bool Success { get; set; }
         public string Error { get; set; }
     }
-    /// <summary>
-    /// Отсновной конвеер службы
-    /// </summary>
+
+    /// <summary>Обработчик цикла: перебор пользователей и смена паролей.</summary>
     public class EventProcessor
     {
         private readonly ServiceConfig _cfg;
@@ -35,6 +35,15 @@ namespace PaswordChService
             _csvPath = cfg.CsvPath;
         }
 
+        // ================================================================
+        //  Основной цикл
+        // ================================================================
+
+        /// <summary>
+        /// Прогон одного цикла смены паролей.
+        /// onlyUsernames = null → все из emails.csv (кроме защищённых).
+        /// Иначе — только перечисленные.
+        /// </summary>
         public List<PasswordChangeResult> RunOnce(IEnumerable<string> onlyUsernames = null)
         {
             var results = new List<PasswordChangeResult>();
@@ -43,6 +52,7 @@ namespace PaswordChService
             var mode = onlyUsernames == null ? "все пользователи" : "выборочно";
             Logger.Info($"=== Начало цикла обработки ({mode}) ===");
 
+            // --- Читаем CSV в словарь username → email ---
             var csvUsers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (File.Exists(_csvPath))
             {
@@ -64,7 +74,8 @@ namespace PaswordChService
                 Logger.Warn("Файл emails.csv не найден: " + _csvPath);
             }
 
-            var targets = new List<Tuple<string, string>>();
+            // --- Формируем список целей ---
+            var targets = new List<Tuple<string, string>>(); // email, username
 
             if (onlyUsernames == null)
             {
@@ -115,6 +126,7 @@ namespace PaswordChService
                 return results;
             }
 
+            // --- Обрабатываем параллельно ---
             var tasks = new List<Task>();
             foreach (var t in targets)
             {
@@ -138,11 +150,18 @@ namespace PaswordChService
                             {
                                 try
                                 {
-                                    // HTML-письмо пользователю
-                                    _mailer.SendUserPassword(email, username, newPassword);
-                                    Thread.Sleep(1500);
+                                    if (_cfg.OtpUseApi)
+                                        SendPasswordViaApi(email, username, newPassword);
+                                    else
+                                    {
+                                        _mailer.SendUserPassword(email, username, newPassword);
+                                        Thread.Sleep(1500);
+                                    }
                                 }
-                                catch (Exception ex) { Logger.Error("Ошибка уведомления " + email, ex); }
+                                catch (Exception ex)
+                                {
+                                    Logger.Error("Ошибка уведомления " + email, ex);
+                                }
                             }
                         }
                         else
@@ -169,6 +188,7 @@ namespace PaswordChService
             var successes = results.Where(r => r.Success).ToList();
             var errors = results.Where(r => !r.Success).ToList();
 
+            // --- Сохраняем новые пароли и создаём ZIP ---
             if (successes.Count > 0)
             {
                 Directory.CreateDirectory(_cfg.ArchivePath);
@@ -186,8 +206,20 @@ namespace PaswordChService
                     Logger.Info("Шифрованный ZIP создан: " + zip);
                 }
                 catch (Exception ex) { Logger.Error("Ошибка архивации", ex); }
+
+                // В режиме полного цикла отправляем отчёт админам.
+                if (onlyUsernames == null)
+                {
+                    try
+                    {
+                        var nextRun = DateTime.Now.AddDays(_cfg.IntervalDays);
+                        _mailer.SendAdminReport(successes, errors, nextRun);
+                    }
+                    catch (Exception ex) { Logger.Error("Ошибка отправки HTML-отчёта админам", ex); }
+                }
             }
 
+            // --- Сохраняем ошибки ---
             if (errors.Count > 0)
             {
                 Directory.CreateDirectory(_cfg.ErrorUsersPath);
@@ -199,24 +231,100 @@ namespace PaswordChService
                 Logger.Warn("Ошибки сохранены: " + errFile);
             }
 
-            // HTML-отчёт админам — только при полном цикле.
-            if (onlyUsernames == null)
-            {
-                try
-                {
-                    var nextRun = DateTime.Now.AddDays(_cfg.IntervalDays);
-                    _mailer.SendAdminReport(successes, errors, nextRun);
-                }
-                catch (Exception ex) { Logger.Error("Ошибка отправки HTML-отчёта админам", ex); }
-            }
-
             Logger.Info($"=== Цикл завершён. Успешно: {successes.Count}, ошибок: {errors.Count} ===");
             return results.OrderBy(r => r.Username).ToList();
         }
+
+        // ================================================================
+        //  Отправка пароля пользователю
+        // ================================================================
+
         /// <summary>
-        /// Политика поролей
-        /// Обязательное присутвие цифр, букв и символов
+        /// Создаёт одноразовую ссылку через API и отправляет её пользователю.
+        /// При ошибке — либо fallback на обычное письмо с паролем, либо только лог.
         /// </summary>
+        private void SendPasswordViaApi(string email, string username, string newPassword)
+        {
+            if (string.IsNullOrEmpty(_cfg.OtpApiUrl) || string.IsNullOrEmpty(_cfg.OtpApiKey))
+            {
+                Logger.Warn("OtpUseApi=true, но ApiUrl/ApiKey не заданы — пропускаю отправку.");
+                if (_cfg.OtpFallbackToPlain)
+                {
+                    _mailer.SendUserPassword(email, username, newPassword);
+                    Thread.Sleep(1500);
+                }
+                return;
+            }
+
+            string url = null;
+            string apiError = null;
+
+            try
+            {
+                using (var client = new OneTimePasswordClient(
+                    _cfg.OtpApiUrl,
+                    _cfg.OtpApiKey,
+                    _cfg.OtpIgnoreSslErrors))
+                {
+                    var result = client.CreateLink(newPassword, _cfg.OtpApiTtlMinutes);
+                    url = result != null ? result.Url : null;
+                }
+
+                // Подменяем хост на публичный адрес из my.ini, если он задан.
+                url = RewritePublicUrl(url, _cfg.OtpPublicBaseUrl);
+            }
+            catch (Exception ex)
+            {
+                apiError = ex.Message;
+                Logger.Error($"API одноразовых паролей не ответил для '{username}': {ex.Message}");
+            }
+
+            if (string.IsNullOrEmpty(url))
+            {
+                Logger.Warn($"Не удалось получить ссылку для '{username}'" +
+                            (apiError != null ? $" ({apiError})" : " (пустой URL)"));
+
+                if (_cfg.OtpFallbackToPlain)
+                {
+                    Logger.Warn("FallbackToPlain=true — отправляю пароль обычным письмом.");
+                    _mailer.SendUserPassword(email, username, newPassword);
+                    Thread.Sleep(1500);
+                }
+                else
+                {
+                    Logger.Warn("FallbackToPlain=false — письмо не отправлено. " +
+                                "Пароль доступен в ZIP-архиве.");
+                }
+                return;
+            }
+
+            Logger.Info($"Ссылка на пароль для {username}: {url}");
+            _mailer.SendUserPasswordLink(email, username, url);
+            Thread.Sleep(1500);
+        }
+
+        /// <summary>
+        /// Заменяет схему/хост/порт в URL, полученном от API, на публичный адрес из my.ini.
+        /// Оставляет путь и query без изменений.
+        /// Если publicBase пуст или url некорректен — возвращает url как есть.
+        /// </summary>
+        private static string RewritePublicUrl(string url, string publicBase)
+        {
+            if (string.IsNullOrWhiteSpace(url)) return url;
+            if (string.IsNullOrWhiteSpace(publicBase)) return url;
+
+            Uri original;
+            if (!Uri.TryCreate(url, UriKind.Absolute, out original)) return url;
+
+            var baseTrimmed = publicBase.TrimEnd('/');
+            return baseTrimmed + original.PathAndQuery;
+        }
+
+        // ================================================================
+        //  Генерация пароля
+        // ================================================================
+
+        /// <summary>Криптостойкая генерация пароля с гарантией всех классов символов.</summary>
         private static string GeneratePassword(int length)
         {
             const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -237,6 +345,7 @@ namespace PaswordChService
             sb.Append(special[bytes[3] % special.Length]);
             for (int i = 4; i < length; i++) sb.Append(all[bytes[i] % all.Length]);
 
+            // Перемешивание Фишера–Йетса
             var chars = sb.ToString().ToCharArray();
             for (int i = chars.Length - 1; i > 0; i--)
             {
